@@ -3,17 +3,6 @@
 import { useState } from "react"
 import type { ProductDetail } from "../../types/product"
 import { getBestImageUrl } from "../../utils/productUtils"
-import { useRouter } from "next/navigation"
-
-interface CartItem {
-  id: number
-  name: string
-  size: string
-  actualPrice: number
-  discountPrice: number
-  quantity: number
-  image: string
-}
 
 interface ProductActionsProps {
   product: ProductDetail
@@ -22,53 +11,9 @@ interface ProductActionsProps {
 export default function ProductActions({ product }: ProductActionsProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(1)
-  const [isAddingToCart, setIsAddingToCart] = useState(false)
-  const router = useRouter()
 
   const incrementQuantity = () => setQuantity((prev) => prev + 1)
   const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1))
-
-  const addToCart = () => {
-    setIsAddingToCart(true)
-
-    const cartItem: CartItem = {
-      id: product.id,
-      name: product.title,
-      size: selectedSize || product.size?.[0]?.sizess || "",
-      actualPrice: product.originalPrice || product.price,
-      discountPrice: product.price,
-      quantity: quantity,
-      image: getBestImageUrl(product.images[0]) || "/placeholder.svg",
-    }
-
-    // Get existing cart from sessionStorage
-    const existingCart = JSON.parse(sessionStorage.getItem("cart") || "[]") as CartItem[]
-
-    // Check if item with same id and size already exists
-    const existingItemIndex = existingCart.findIndex(
-      (item) => item.id === cartItem.id && item.size === cartItem.size
-    )
-
-    if (existingItemIndex > -1) {
-      // Update quantity if item exists
-      existingCart[existingItemIndex].quantity += cartItem.quantity
-    } else {
-      // Add new item to cart
-      existingCart.push(cartItem)
-    }
-
-    // Save to sessionStorage
-    sessionStorage.setItem("cart", JSON.stringify(existingCart))
-
-    // Also save to localStorage for persistence across sessions
-    localStorage.setItem("cart", JSON.stringify(existingCart))
-
-    // Show feedback and redirect
-    setTimeout(() => {
-      setIsAddingToCart(false)
-      router.push("/cart")
-    }, 500)
-  }
 
   return (
     <div className="space-y-6">
@@ -130,16 +75,17 @@ export default function ProductActions({ product }: ProductActionsProps) {
       {/* Action Buttons */}
       <div className="space-y-4 pt-4">
         <button
-          onClick={addToCart}
-          disabled={isAddingToCart}
-          className={`w-full py-4 font-medium text-sm uppercase tracking-wide transition-all ${isAddingToCart ? "bg-green-600 text-white" : "bg-black text-white hover:bg-gray-800"
-            }`}
+          disabled
+          className="w-full py-4 bg-gray-300 text-gray-500 font-medium text-sm uppercase tracking-wide cursor-not-allowed"
         >
-          {isAddingToCart ? "ADDED TO CART ✓" : "ADD TO CART"}
+          COMING SOON
         </button>
 
-        <button className="w-full py-4 bg-orange-400 text-white font-medium text-sm uppercase tracking-wide hover:bg-orange-500 transition-colors">
-          BUY IT NOW
+        <button
+          disabled
+          className="w-full py-4 bg-gray-300 text-gray-500 font-medium text-sm uppercase tracking-wide cursor-not-allowed"
+        >
+          COMING SOON
         </button>
       </div>
     </div>
