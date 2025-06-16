@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import type { ProductDetail } from "../../../types/product"
 import { getDescriptionText } from "../../../utils/productUtils"
 import ProductImageCarousel from "../../../components/product/ProductImageCarousel"
