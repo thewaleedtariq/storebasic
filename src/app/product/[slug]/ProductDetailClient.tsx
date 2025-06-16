@@ -14,23 +14,6 @@ interface ProductDetailClientProps {
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
     return (
         <div className="flex-1 min-h-screen">
-            {/* Breadcrumb */}
-            <div className="bg-white border-gray">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
-                    <nav className="text-sm text-gray-600">
-                        <Link href="/" className="hover:text-gray-900 cursor-pointer">
-                            HOME
-                        </Link>
-                        <span className="mx-2">›</span>
-                        <Link href="/listing" className="hover:text-gray-900 cursor-pointer">
-                            {product.category?.name}
-                        </Link>
-                        <span className="mx-2">›</span>
-                        <span className="text-gray-900 font-medium">{product.title}</span>
-                    </nav>
-                </div>
-            </div>
-
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     {/* Left - Image Carousel */}
