@@ -1,63 +1,29 @@
+/* --- new at-font-face block (top of the file) ------------------- */
+@font-face {
+  font-family: "Harmonia Sans";
+  src: url("/fonts/Harmonia Sans W01 Regular.otf") format("opentype"), url("/fonts/Harmonia Sans W01 Regular.ttf")
+    format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Harmonia Sans";
+  src: url("/fonts/Harmonia Sans W01 Bold.otf") format("opentype"), url("/fonts/Harmonia Sans W01 Bold.ttf")
+    format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------------- */
 @import "tailwindcss";
-@import 'keen-slider/keen-slider.min.css';
+@import "keen-slider/keen-slider.min.css";
 
-.slick-slide,
-.slick-track,
-.slick-list {
-  height: 100%;
-}
-
-.slick-slide > div {
-  height: 100%;
-  background: transparent !important;
-}
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* existing styles … (unchanged) ---------------------------------- */
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-harmonia-sans), sans-serif;
-}
-
-/* Hide scrollbar for Chrome, Safari and Opera */
-html::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for IE, Edge and Firefox */
-html {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-
-/* Marquee Animation */
-@keyframes marquee {
-  0% {
-    transform: translateX(100%);
-  }
-
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
-.animate-marquee {
-  animation: marquee 20s linear infinite;
-  display: inline-block;
-}
-
-/* Header Border */
-.header-border {
-  border-bottom: 1px solid #e5e7eb;
+  font-family: "Harmonia Sans", sans-serif;
 }

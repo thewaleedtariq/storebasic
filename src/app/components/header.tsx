@@ -73,6 +73,15 @@ export default function Header() {
                 />
               </svg>
             </button>
+            <Link href="/cart" className="hover:text-gray-900 transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13l-1.5-6M7 13h10"
+                />
+              </svg>
+            </Link>
             {/* Mobile menu button */}
             <button className="md:hidden hover:text-gray-900 transition-colors" onClick={() => setOpen(!open)}>
               <Menu className="w-5 h-5" />

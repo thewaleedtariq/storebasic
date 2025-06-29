@@ -36,15 +36,13 @@ interface Category {
 
 async function fetchBanners(): Promise<BannerImage[]> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/banners?populate[0]=bImage`, {
-      next: { revalidate: 3600 }, // Revalidate every hour
-    })
+    const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/banners?populate[0]=bImage`)
     if (!res.ok) throw new Error("Failed to fetch banners")
 
     const data = await res.json()
     return data?.data?.[0]?.bImage || []
   } catch (error) {
-    console.error("Error fetching banners:", error)
+    console.error("Error fetching banner:", error)
     return []
   }
 }
@@ -53,9 +51,6 @@ async function fetchCategories(): Promise<Category[]> {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/categories?fields[0]=id&fields[1]=name&fields[2]=slug&populate[0]=image`,
-      {
-        next: { revalidate: 3600 }, // Revalidate every hour
-      },
     )
     if (!res.ok) throw new Error("Failed to fetch categories")
 
@@ -67,10 +62,10 @@ async function fetchCategories(): Promise<Category[]> {
         slug: category.slug,
         image: category.image
           ? {
-            id: category.image.id,
-            url: category.image.url,
-            alternativeText: category.image.alternativeText,
-          }
+              id: category.image.id,
+              url: category.image.url,
+              alternativeText: category.image.alternativeText,
+            }
           : null,
       }))
     }
@@ -80,6 +75,9 @@ async function fetchCategories(): Promise<Category[]> {
     return []
   }
 }
+
+// This makes the page statically generated at build time
+export const dynamic = "force-static"
 
 export default async function Home() {
   const [bannersData, categoriesData] = await Promise.all([fetchBanners(), fetchCategories()])

@@ -1,120 +1,100 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Image from "next/image"
-import { Carousel } from "react-responsive-carousel"
-import type { ProductDetail } from "../../types/product"
-import { getBestImageUrl } from "../../utils/productUtils"
-import "react-responsive-carousel/lib/styles/carousel.min.css"
+import { useKeenSlider, type KeenSliderPlugin } from "keen-slider/react"
+import type { ProductDetail } from "@/types/product"
+import { getBestImageUrl } from "@/utils/productUtils"
 
 interface ProductImageCarouselProps {
   images: ProductDetail["images"]
 }
 
-export default function ProductImageCarousel({ images }: ProductImageCarouselProps) {
-  const [loadedImages, setLoadedImages] = useState<{ [key: number]: boolean }>({})
-  const [currentSlide, setCurrentSlide] = useState(0)
-
-  const handleImageLoad = (index: number) => {
-    setLoadedImages((prev) => ({ ...prev, [index]: true }))
+/* Auto-play plugin */
+const AutoSlide: KeenSliderPlugin = (slider) => {
+  let timeout: ReturnType<typeof setTimeout>
+  let mouseOver = false
+  function clearNextTimeout() {
+    clearTimeout(timeout)
   }
+  function nextTimeout() {
+    clearTimeout(timeout)
+    if (mouseOver) return
+    timeout = setTimeout(() => {
+      slider.next()
+    }, 3000)
+  }
+  slider.on("created", () => {
+    slider.container.addEventListener("mouseover", () => {
+      mouseOver = true
+      clearNextTimeout()
+    })
+    slider.container.addEventListener("mouseout", () => {
+      mouseOver = false
+      nextTimeout()
+    })
+    nextTimeout()
+  })
+  slider.on("dragStarted", clearNextTimeout)
+  slider.on("animationEnded", nextTimeout)
+  slider.on("updated", nextTimeout)
+}
 
-  // Preload next image
-  useEffect(() => {
-    const nextIndex = (currentSlide + 1) % images.length
-    if (!loadedImages[nextIndex]) {
-      const img = new window.Image()
-      img.src = getBestImageUrl(images[nextIndex])
-    }
-  }, [currentSlide, images, loadedImages])
+export default function ProductImageCarousel({ images }: ProductImageCarouselProps) {
+  const [current, setCurrent] = useState(0)
+  const [sliderRef, instanceRef] = useKeenSlider(
+    {
+      slideChanged(s) {
+        setCurrent(s.track.details.rel)
+      },
+      loop: true,
+      mode: "snap",
+    },
+    [AutoSlide],
+  )
 
   return (
-    <div className="bg-white p-6">
-      <div className="w-full" style={{ height: "500px" }}>
-        <Carousel
-          showThumbs={true}
-          showStatus={false}
-          infiniteLoop
-          useKeyboardArrows
-          emulateTouch
-          showArrows={true}
-          className="h-full"
-          thumbWidth={80}
-          onChange={(index: number) => setCurrentSlide(index)}
-          renderThumbs={() =>
-            images.map((img, index) => (
-              <div key={index} className="relative w-20 h-20">
-                <Image
-                  src={getBestImageUrl(img) || "/placeholder.svg"}
-                  alt={`Thumbnail ${index + 1}`}
-                  fill
-                  sizes="80px"
-                  className="object-cover"
-                  onLoad={() => handleImageLoad(index)}
-                  priority={index === 0}
-                  quality={75}
-                />
-              </div>
-            ))
-          }
-        >
-          {images.map((img, index) => (
-            <div key={index} className="h-full flex items-center justify-center">
-              <div className="relative w-full h-full">
-                {!loadedImages[index] && <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>}
-                <Image
-                  src={getBestImageUrl(img) || "/placeholder.svg"}
-                  alt={`Product image ${index + 1}`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className={`object-contain transition-opacity duration-300 ${loadedImages[index] ? "opacity-100" : "opacity-0"}`}
-                  onLoad={() => handleImageLoad(index)}
-                  priority={index === 0}
-                  quality={85}
-                />
-              </div>
+    <div className="relative">
+      {/* MAIN SLIDER */}
+      <div ref={sliderRef} className="keen-slider aspect-square overflow-hidden">
+        {images.map((img, idx) => (
+          <div key={idx} className="keen-slider__slide flex items-center justify-center bg-white">
+            <div className="relative w-full h-full">
+              <Image
+                src={getBestImageUrl(img) || "/placeholder.svg"}
+                alt={`Product image ${idx + 1}`}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-contain"
+                priority={idx === 0}
+                quality={85}
+              />
             </div>
-          ))}
-        </Carousel>
+          </div>
+        ))}
       </div>
 
-      <style jsx global>{`
-                .carousel {
-                    height: 100%;
-                }
-                .carousel .slider-wrapper {
-                    height: 100%;
-                }
-                .carousel .slider {
-                    height: 100%;
-                }
-                .carousel .slide {
-                    height: 100%;
-                    background: transparent;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-                .carousel .slide > div {
-                    height: 100%;
-                    width: 100%;
-                }
-                .carousel .thumbs-wrapper {
-                    margin: 10px 0 0;
-                }
-                .carousel .thumb {
-                    border: 2px solid transparent;
-                    padding: 0;
-                    margin: 0 4px;
-                    cursor: pointer;
-                }
-                .carousel .thumb.selected {
-                    border-color: #000;
-                }
-                .carousel .thumb:hover {
-                    border-color: #666;
-                }
-            `}</style>
+      {/* THUMBNAILS */}
+      {images.length > 1 && (
+        <div className="flex gap-2 mt-4 justify-center">
+          {images.map((img, idx) => (
+            <button
+              key={idx}
+              onClick={() => instanceRef.current?.moveToIdx(idx)}
+              className={`w-16 h-16 relative border-2 ${current === idx ? "border-black" : "border-transparent"}`}
+              aria-label={`thumbnail ${idx + 1}`}
+            >
+              <Image
+                src={getBestImageUrl(img) || "/placeholder.svg"}
+                alt={`Thumbnail ${idx + 1}`}
+                fill
+                sizes="64px"
+                className="object-cover"
+              />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
